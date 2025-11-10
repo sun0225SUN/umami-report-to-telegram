@@ -1,0 +1,38 @@
+name: Umami Report
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Umami Report Script
+        env:
+          UMAMI_API_URL: ${{ secrets.UMAMI_API_URL }}
+          UMAMI_WEBSITE_ID: ${{ secrets.UMAMI_WEBSITE_ID }}
+          # For self-hosted Umami: use UMAMI_USER and UMAMI_PASSWORD
+          UMAMI_USER: ${{ secrets.UMAMI_USER }}
+          UMAMI_PASSWORD: ${{ secrets.UMAMI_PASSWORD }}
+          # For Umami Cloud or if you have API token: use UMAMI_API_TOKEN
+          UMAMI_API_TOKEN: ${{ secrets.UMAMI_API_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python umami_report.py
+
+# UMAMI_WEBSITE_ID="9ab6d73e-e1a0-4f42-8b02-f3153050a1c5:Blog,f09e3429-8b05-4c74-9cd7-a63623a69e7c:camlife tools,c3275ae2-1d30-4876-8de6-861097b6140b:camlife,f382c8db-e41d-4b65-8d4b-ffbcc5f86b93:podcast,e3e374d1-fd20-4032-895e-d223d4aba22b:cyc"
